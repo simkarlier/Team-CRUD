@@ -2,8 +2,7 @@
 
 var express = require('express'),
   router = express.Router(),
-  mongoose = require('mongoose'),
-  User = mongoose.model('User');
+ 
 
 module.exports = function (app) {
   app.use('/api/v1/issues', router);
@@ -36,7 +35,7 @@ module.exports = function (app) {
  *     }
  */
 router.post('/', function (req, res, next) {
-
+/*
   var user = new User(req.body);
 
   user.save(function(err, createdUser){
@@ -48,12 +47,12 @@ router.post('/', function (req, res, next) {
 
     res.send(createdUser);
 
-  });
+  });*/
 });
 
 
 router.get('/', function(req,res,next){
-
+/*
   User.find(function(err, users){
     if(err){
 
@@ -63,5 +62,6 @@ router.get('/', function(req,res,next){
     res.send(users);
 
   })
+*/
 
 });
