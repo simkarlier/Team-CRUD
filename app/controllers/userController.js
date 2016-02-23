@@ -11,11 +11,12 @@ module.exports = function (app) {
 
 
 /**
- * @api {post} /api/v1/users Create User information
+ * @api {post} /api/v1/users Create User 
  * @apiName Create User
- * @apiGroup Developper
+ * @apiGroup Users
  *
- * @apiParam {Number} id Users unique ID.
+ * @apiParam {String} firstname User firstname.
+ * @apiParam {String} lastname User lastname.
  *
  * @apiSuccess {String} firstname Firstname of the User.
  * @apiSuccess {String} lastname  Lastname of the User.
