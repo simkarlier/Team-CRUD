@@ -18,6 +18,7 @@
     "jade": "^1.11.0",
     "method-override": "^2.3.0",
     "mongoose": "^4.1.2",
+    "mongoose-validate": "git://github.com/RGBboy/mongoose-validate.git",
     "morgan": "^1.6.1",
     "serve-favicon": "^2.3.0"
   },
