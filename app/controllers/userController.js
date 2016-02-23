@@ -1,7 +1,19 @@
+
+
+var express = require('express'),
+  router = express.Router(),
+  mongoose = require('mongoose'),
+  User = mongoose.model('User');
+
+module.exports = function (app) {
+  app.use('/api/v1/users', router);
+};
+
+
 /**
- * @api {get} /user/:id Request User information
- * @apiName GetUser
- * @apiGroup User
+ * @api {post} /api/v1/users Create User information
+ * @apiName Create User
+ * @apiGroup Developper
  *
  * @apiParam {Number} id Users unique ID.
  *
@@ -23,16 +35,6 @@
  *       "error": "UserNotFound"
  *     }
  */
- 
-var express = require('express'),
-  router = express.Router(),
-  mongoose = require('mongoose'),
-  User = mongoose.model('User');
-
-module.exports = function (app) {
-  app.use('/api/v1/users', router);
-};
-
 router.post('/', function (req, res, next) {
 
   var user = new User(req.body);
@@ -48,6 +50,7 @@ router.post('/', function (req, res, next) {
 
   });
 });
+
 
 router.get('/', function(req,res,next){
 
