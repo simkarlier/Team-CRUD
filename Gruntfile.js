@@ -5,13 +5,23 @@ var request = require('request');
 module.exports = function (grunt) {
   // show elapsed time at the end
   require('time-grunt')(grunt);
+
+
   // load all grunt tasks
   require('load-grunt-tasks')(grunt);
+
+  grunt.loadNpmTasks('grunt-apidoc');
 
   var reloadPort = 35729, files;
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    apidoc: {
+        myapp: {
+        src: "./app/",
+        dest: "./documentation/"
+       }
+    },    
     develop: {
       server: {
         file: 'app.js'
@@ -23,7 +33,7 @@ module.exports = function (grunt) {
           'public/css/style.css': 'public/css/style.less'
         }
       }
-    },
+    }, 
     watch: {
       options: {
         nospawn: true,
@@ -53,7 +63,7 @@ module.exports = function (grunt) {
         ],
         options: { livereload: reloadPort }
       }
-    }
+    },
   });
 
   grunt.config.requires('watch.js.files');
@@ -75,6 +85,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('default', [
+    'apidoc',
     'less',
     'develop',
     'watch'
