@@ -4,3 +4,6 @@ Course: [https://github.com/SoftEng-HEIGVD/Teaching-HEIGVD-CM_WEBS-2016](https:/
 
 Each group must fork this repository to work on this course and deliver their API.
 Please __rewrite__ this README to explain how to deploy and use your API and give the relevant links.
+
+specs : 
+https://docs.google.com/document/d/1Uii_bUapwRHsASehWpuoFNYshhU3wAXCJ5ghWgi-s_s/edit?usp=sharing
