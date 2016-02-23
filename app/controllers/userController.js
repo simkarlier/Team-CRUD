@@ -11,7 +11,7 @@ router.post('/', function (req, res, next) {
 
   var user = new User(req.body);
 
-  person.save(function(err, createdUser){
+  user.save(function(err, createdUser){
 
     if(err){
       res.status(500).send(err);

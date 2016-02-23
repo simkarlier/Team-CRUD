@@ -8,15 +8,7 @@ var UserSchema = new Schema({
       lastname:{type:String,required:true},
       role:{type:[String],required:true},
       password:{type:String,required:true},
-      token:{type:String,required:true},
-      email: {
-        type: String,
-        trim: true,
-        unique: true,
-        required: 'Email address is required',
-        validate: [validateEmail, 'Please fill a valid email address'],
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
-        }
+      token:{type:String,required:true}
 });
 
 var validateEmail = function(email) {
