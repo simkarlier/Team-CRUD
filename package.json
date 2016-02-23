@@ -5,6 +5,10 @@
   "scripts": {
     "start": "node app.js"
   },
+ "apidoc": {
+    "title": "Team CRUD",
+    "url" : "https://github.com/simkarlier/Team-CRUD/"
+  },
   "dependencies": {
     "apidoc": "^0.15.1",
     "body-parser": "^1.13.3",
