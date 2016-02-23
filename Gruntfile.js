@@ -18,8 +18,8 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
     apidoc: {
         myapp: {
-        src: "./app/",
-        dest: "./documentation/"
+        src: "app/",
+        dest: "documentation/"
        }
     },    
     develop: {
