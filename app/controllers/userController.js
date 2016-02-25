@@ -15,8 +15,12 @@ module.exports = function (app) {
  * @apiName Create User
  * @apiGroup Users
  *
- * @apiParam {String} firstname user firstname.
- * @apiParam {String} lastname user lastname.
+ * @apiParam {String}   firstname user firstname.
+ * @apiParam {String}   lastname user lastname.
+ * @apiParam {[String]} role user role(s).
+ * @apiParam {String}   password user password.
+ * @apiParam {String}   email user email.
+
  *
  * @apiSuccess {String} firstname Firstname of the user.
  * @apiSuccess {String} lastname  Lastname of the user.
