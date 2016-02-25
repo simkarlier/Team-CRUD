@@ -3,10 +3,10 @@
 var express = require('express'),
   router = express.Router(),
   mongoose = require('mongoose'),
-  User = mongoose.model('User');
+  Action = mongoose.model('Action');
 
 module.exports = function (app) {
-  app.use('/api/v1/users', router);
+  app.use('/api/v1/actions', router);
 };
 
 
@@ -38,32 +38,30 @@ module.exports = function (app) {
  */
 router.post('/', function (req, res, next) {
 
-  var user = new User(req.body);
+  var action = new Action(req.body);
 
-  user.save(function(err, createdUser){
+  action.save(function(err, createdAction){
 
     if(err){
       res.status(500).send(err);
       return;
     }
 
-    res.send(createdUser);
+    res.send(createdAction);
 
   });
 });
 
 
-
 router.get('/', function(req,res,next){
 
-
-  User.find(function(err, users){
+  Action.find(function(err, actions){
     if(err){
 
       res.status(500).send(err);
       return;
     }
-    res.send(users);
+    res.send(actions);
 
   })
 
