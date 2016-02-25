@@ -15,11 +15,11 @@ module.exports = function (app) {
  * @apiName Create User
  * @apiGroup Users
  *
- * @apiParam {String} firstname User firstname.
- * @apiParam {String} lastname User lastname.
+ * @apiParam {String} firstname user firstname.
+ * @apiParam {String} lastname user lastname.
  *
- * @apiSuccess {String} firstname Firstname of the User.
- * @apiSuccess {String} lastname  Lastname of the User.
+ * @apiSuccess {String} firstname Firstname of the user.
+ * @apiSuccess {String} lastname  Lastname of the user.
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
