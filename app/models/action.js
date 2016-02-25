@@ -34,7 +34,7 @@ var ActionSchema = new Schema({
       date:{type:Date,required:true},
       newStatus:{type:String, validate: [statusChangeValidator, 'A status change can\'t be definited in a comment action']},
       comment:{type:String, validate: [commentValidator, 'A comment can\'t be definited in a status change action']},
-      authorId:{type:Schema.Types.ObjectId, ref:'User', required:true}
+      authorId:{type:Schema.Types.ObjectId,ref:'User',required:true}
 });
 
 
