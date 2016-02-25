@@ -5,27 +5,19 @@ var mongoose = require('mongoose'),
 
 // Validate the comment, true if the action type is comment
 var commentValidator = function(comment){
-  if(comment){
-    if(this.type == 'comment'){
+  if(comment && this.type == 'comment'){
       return true;
-    }else{
-      return false;
-    }
   }else{
-    return false;
+      return false;
   }
 }
 
 // Validate the statusChange, true if the action type is status change
 var statusChangeValidator = function(status){
-  if(status){
-    if(this.type == 'statusChange'){
-      return true;
-    }else{
-      return false;
-    }
+  if(status && this.type == 'statusChange'){
+    return true;
   }else{
-    return false;
+      return false;
   }
 }
 
