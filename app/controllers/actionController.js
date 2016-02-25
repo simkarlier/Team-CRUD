@@ -66,3 +66,48 @@ router.get('/', function(req,res,next){
   })
 
 });
+
+function findAction(req, res, next) {
+  Action.findById(req.params.id, function(err, action) {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    } else if (!action) {
+      res.status(404).send('Action not found');
+      return;
+    }
+
+    // Store the book in the request.
+    req.action = action;
+
+    next();
+  });
+}
+
+router.get('/:id', findAction, function(req,res,next){
+
+  res.send(req.action);
+
+});
+
+function findActionByType(req, res, next) {
+  Action.find({type: req.params.actionType})
+    // Do not forget to sort, as pagination makes more sense with sorting.
+    .sort('date')
+    .exec(function(err, actionsByType) {
+      if (err) {
+        console.log('fd')
+        res.status(500).send(err);
+        return;
+      }
+      req.actionsByType = actionsByType;
+
+      next();
+    });
+}
+
+router.get('/type/:actionType', findActionByType, function(req,res,next){
+
+    res.send(req.actionsByType);
+
+});
