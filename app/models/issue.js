@@ -34,7 +34,7 @@ var IssueSchema = new Schema({
       	coordinates :{type:[Number],required:true,validate:[valArray,"Incorrect number of coordinates"]}
       },
       status: {type: String, enum: ['created', 'acknowledged', 'assigned', 'in_progress', 'solved', 'rejected'] },
-      responsible_author:{type:Schema.Types.ObjectId,ref:'User',required:true},
+      responsible_user:{type:Schema.Types.ObjectId,ref:'User',required:true},
       actions : [],
       creation_date:{type: Date, required:true}
 });

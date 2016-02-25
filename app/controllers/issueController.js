@@ -107,6 +107,8 @@ router.get('/', function(req,res,next){
         .sort(sort)
         .skip(offset)
         .limit(limit)
+        .populate("author", '-_id -__v -password')
+        .populate("responsible_user", '-_id -__v -password')
         .exec(function(err, issues) {
           if (err) {
             res.status(500).send(err);
@@ -114,7 +116,6 @@ router.get('/', function(req,res,next){
           }
           res.send(issues);
         })
-        .populate("User");
     })
   })
 });
