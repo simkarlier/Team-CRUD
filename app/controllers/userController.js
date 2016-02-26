@@ -4,6 +4,7 @@ var express = require('express'),
   router = express.Router(),
   mongoose = require('mongoose'),
   User = mongoose.model('User'),
+  Issue = mongoose.model('Issue'),
   Action = mongoose.model('Action');
 
 module.exports = function (app) {
@@ -114,6 +115,68 @@ router.post('/', function (req, res, next) {
  */
 router.get('/', function(req,res,next){
 
+    
+    
+    //if the user specifies special stats
+    if(req.query.embed){
+      
+      if(req.query.embed == "number_of_created_issues"){
+        var criteria ={};
+
+        var sort={};
+        sort.count=-1;
+
+        countIssuesAuthor(criteria,sort,function(err,numberOfIssues){
+         if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          res.send(numberOfIssues);
+        });
+        //return the .get function
+      return;
+      }
+      else if(req.query.embed == "number_of_solved_issues"){
+        var criteria ={};
+        criteria.status = "solved";
+
+        var sort={};
+        sort.count=-1;
+
+        countIssuesResponsibleUser(criteria,sort,function(err,numberOfIssues){
+         if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          res.send(numberOfIssues);
+        });
+        //return the .get function
+      return;
+      }
+      else if(req.query.embed == "number_of_unsolved_or_rejected_issues"){
+        var criteria ={};
+        criteria.status = { $nin: ["solved","rejected"] };
+
+        var sort={};
+        sort.count=1;
+
+        countIssuesResponsibleUser(criteria,sort,function(err,numberOfIssues){
+         if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          res.send(numberOfIssues);
+        });
+        //return the .get function
+      return;
+      }
+    }
+    
+
+  
   User.find()
       .sort('lastname')
       .exec(function(err, users) {
@@ -125,9 +188,85 @@ router.get('/', function(req,res,next){
           res.send(users);
 
       })
-
 });
 
+function countIssuesAuthor(criteria, sort,callback) {
+   Issue.aggregate([
+      {
+        $match: criteria
+      },
+      {
+        $group: {
+          _id: '$author',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: sort
+      },
+      {
+        $skip: 0
+      },
+      {
+        $limit: 30
+      }
+    ])
+   .exec(function(err,numberOfIssues){
+      var opts = [{ path: '_id', select: 'firstname lastname email'}];
+
+      User.populate(numberOfIssues,opts,function(e,pop){
+        
+        var newPops =[];
+
+        for(var i=0;i<pop.length;i++){
+          var newPop = JSON.parse(JSON.stringify(pop[i]._id));
+          newPop["count"] = pop[i].count;
+          newPops.push(newPop);
+        }
+
+        callback(e,newPops);
+      });
+   })
+}
+
+function countIssuesResponsibleUser(criteria, sort,callback) {
+   Issue.aggregate([
+      {
+        $match: criteria,
+      },
+      {
+        $group: {
+          _id: '$responsible_user',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: sort
+      },
+      {
+        $skip: 0
+      },
+      {
+        $limit: 30
+      }
+    ])
+   .exec(function(err,numberOfIssues){
+      var opts = [{ path: '_id', select: 'firstname lastname email'}];
+
+      User.populate(numberOfIssues,opts,function(e,pop){
+        
+        var newPops =[];
+
+        for(var i=0;i<pop.length;i++){
+          var newPop = JSON.parse(JSON.stringify(pop[i]._id));
+          newPop["count"] = pop[i].count;
+          newPops.push(newPop);
+        }
+
+        callback(e,newPops);
+      });
+   })
+}
 
 
 // function to find a user with his id, given in the url
@@ -183,6 +322,9 @@ function findUser(req, res, next) {
  *       "error": "UserNotFound"
  *     }
  */
+
+
+
 router.get('/:id',findUser, function(req,res,next){
 
     res.send(req.user);
