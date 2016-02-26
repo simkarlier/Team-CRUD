@@ -262,9 +262,8 @@ router.get('/', function(req,res,next){
  * @apiName List one issue
  * @apiGroup Issues
  *
- * @apiParam {:id} id of the issue
- * @apiParam {String} lastname user lastname.
-
+ * @apiParam {String} id  of the issue
+*
  *
  * @apiSuccessExample Success-Response:
   [
@@ -482,13 +481,13 @@ router.get('/:id/actions', function(req,res,next){
 
 function findIssue(req, res, next){
 
-  Publisher.findById(req.params.id, function(err, issue) {
+  Issue.findById(req.params.id, function(err, issue) {
     if (err) {
       res.status(500).send(err);
       return;
     } else if (!issue) {
       // Return an error if the publisher doesn't exist.
-      res.status(400).send('No publisher with ID ' + req.body.publisherId);
+      res.status(400).send('No issue with ID ' + req.body._id);
       return;
     }
 
@@ -547,8 +546,6 @@ function findIssue(req, res, next){
  */
 router.put('/:id',findIssue,function(req,res,next){
 
-  req.issue = req.body;
-
   req.issue.save(function(err, updatedIssue) {
     if (err) {
       res.status(500).send(err);
@@ -556,6 +553,56 @@ router.put('/:id',findIssue,function(req,res,next){
     }
 
     res.send(updatedIssue);
+  });
+
+});
+
+
+/**
+ * @api {delete} /api/v1/issues/:id Delete an issue
+ * @apiName Delete an issue
+ * @apiGroup Issues
+ *
+ * @apiParam {String} _id Id of the issue
+ *
+ * @apiSuccess {Id} _id id of the issue
+ * @apiSuccess {String} name name of the issue
+ * @apiSuccess {Id} author author's id
+ * @apiSuccess {String} description description of the issue
+ * @apiSuccess {String[]} tags an array of tags
+ * @apiSuccess {Number[]} geometry.coordinates the coordinates of the issue (lat,long)
+ * @apiSuccess {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} status status of the issue
+ * @apiSuccess {Id} responsible_user responsible user's id
+ * @apiSuccess {Action[]} actions the actions of the issue
+ * @apiSuccess{Date} creation_date date of creation
+ *
+ * @apiParamExample {json} Request-Example:
+ *  {
+  *  "name":"Incendie",
+   * "author": "56cec2b5310859ee16a3ec59",
+    *"type": "Incendie",
+    *"tags":["ny","yverdon","oups"],
+    *"description":"Graffiti spotted at the train station",
+    *"geometry":{
+    *    "coordinates":[46.2,7.34]
+    *  },
+    *"status" : "created",
+    *"responsible_user" : "56cec2b5310859ee16a3ec59",
+    *"actions":[],
+    *"creation_date" :"2016-02-25"
+    *}
+ *
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500
+ */
+router.delete('/:id',findIssue,function(req,res,next){
+  req.issue.remove(function(err) {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+    res.sendStatus(204);
   });
 
 });

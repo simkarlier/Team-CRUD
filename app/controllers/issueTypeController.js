@@ -30,7 +30,7 @@ module.exports = function (app) {
  *    __v: 0
  *  }
  *
- * @apiError Can't create the issueType.
+ * @apiError Canot create the issueType.
  *
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 404 Not Found
