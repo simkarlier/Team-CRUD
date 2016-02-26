@@ -120,7 +120,7 @@ router.get('/', function(req,res,next){
     //if the user specifies special stats
     if(req.query.embed){
       
-      if(req.query.embed == "number_of_created_issues"){
+      if(req.query.embed == "numberOfCreatedIssues"){
         var criteria ={};
 
         var sort={};
@@ -137,7 +137,7 @@ router.get('/', function(req,res,next){
         //return the .get function
       return;
       }
-      else if(req.query.embed == "number_of_solved_issues"){
+      else if(req.query.embed == "numberOfSolvedIssues"){
         var criteria ={};
         criteria.status = "solved";
 
@@ -155,7 +155,7 @@ router.get('/', function(req,res,next){
         //return the .get function
       return;
       }
-      else if(req.query.embed == "number_of_unsolved_or_rejected_issues"){
+      else if(req.query.embed == "numberOfUnsolvedOrRejectedIssues"){
         var criteria ={};
         criteria.status = { $nin: ["solved","rejected"] };
 
@@ -236,7 +236,7 @@ function countIssuesResponsibleUser(criteria, sort,callback) {
       },
       {
         $group: {
-          _id: '$responsible_user',
+          _id: '$responsibleUser',
           count: { $sum: 1 }
         }
       },

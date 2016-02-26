@@ -19,37 +19,37 @@ module.exports = function (app) {
  * @apiParam {Id} author author's id
  * @apiParam {String} description description of the issue
  * @apiParam {String[]} tags an array of tags
- * @apiParam {Number[]} geometry.coordinates the coordinates of the issue (lat,long)
+ * @apiParam {Number[]} location.coordinates the coordinates of the issue (lat,long)
  * @apiParam {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} status status of the issue
- * @apiParam {Id} responsible_user responsible user's id
+ * @apiParam {Id} responsibleUser responsible user's id
  * @apiParam {Action[]} actions the actions of the issue
- * @apiParam {Date} creation_date date of creation
+ * @apiParam {Date} creationDate date of creation
  *
  * @apiSuccess {Id} _id id of the issue
  * @apiSuccess {String} name name of the issue
  * @apiSuccess {Id} author author's id
  * @apiSuccess {String} description description of the issue
  * @apiSuccess {String[]} tags an array of tags
- * @apiSuccess {Number[]} geometry.coordinates the coordinates of the issue (lat,long)
+ * @apiSuccess {Number[]} location.coordinates the coordinates of the issue (long,lat)
  * @apiSuccess {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} status status of the issue
- * @apiSuccess {Id} responsible_user responsible user's id
+ * @apiSuccess {Id} responsibleUser responsible user's id
  * @apiSuccess {Action[]} actions the actions of the issue
- * @apiSuccess{Date} creation_date date of creation
+ * @apiSuccess{Date} creationDate date of creation
  *
  * @apiParamExample {json} Request-Example:
  *  {
-  *  "name":"Incendie",
+  *  "name":"Incendie à Yverdon",
    * "author": "56cec2b5310859ee16a3ec59",
     *"type": "Incendie",
     *"tags":["ny","yverdon","oups"],
     *"description":"Graffiti spotted at the train station",
-    *"geometry":{
-    *    "coordinates":[46.2,7.34]
+    *"location":{
+    *    "coordinates":[7.34,46.2],
     *  },
     *"status" : "created",
-    *"responsible_user" : "56cec2b5310859ee16a3ec59",
+    *"responsibleUser" : "56cec2b5310859ee16a3ec59",
     *"actions":[],
-    *"creation_date" :"2016-02-25"
+    *"creationDate" :"2016-02-25"
     *}
  *
  *
@@ -83,7 +83,7 @@ router.post('/', function (req, res, next) {
  * @apiParam {String[]} tags
  * @apiParam {Date} start the start date
  * @apiParam {Date} end the end date
- * @apiParam {String} sort=creation_date the sort field
+ * @apiParam {String} sort=creationDate the sort field
  * @apiParam {Number} page page number
  * @apiParam {Number} pageSize page size
  *
@@ -91,7 +91,7 @@ router.post('/', function (req, res, next) {
  [
   {
     "_id": "56ced41fdb8b53091c1b9712",
-    "name": "Incendie",
+    "name": "Incendie à Yverdon",
     "author": {
       "firstname": "Simon",
       "lastname": "Carlier",
@@ -104,14 +104,11 @@ router.post('/', function (req, res, next) {
     "description": "Graffiti spotted at the train station",
     "status": "created",
     "responsible_author": "56cec2b5310859ee16a3ec59",
-    "creation_date": "2016-02-23T00:00:00.000Z",
+    "creationDate": "2016-02-23T00:00:00.000Z",
     "__v": 0,
     "actions": [],
-    "geometry": {
-      "coordinates": [
-        46.2,
-        7.34
-      ],
+    "location": {
+      "coordinates":[7.34,46.2],
       "type": "point"
     },
     "tags": [
@@ -134,7 +131,7 @@ router.post('/', function (req, res, next) {
     "type": "Incendie",
     "description": "Graffiti spotted at the train station",
     "status": "created",
-    "responsible_user": {
+    "responsibleUser": {
       "firstname": "Simon",
       "lastname": "Carlier",
       "email": "admin@simka.ch",
@@ -154,7 +151,7 @@ router.get('/', function(req,res,next){
       limit = pageSize;
 
 
-  var sort="-creation_date";
+  var sort="-creationDate";
 
 
   //GIS Implementation
@@ -203,19 +200,19 @@ router.get('/', function(req,res,next){
   if(req.query.start || req.query.end){
 
     if(req.query.start && req.query.end){
-       criteria.creation_date = {
+       criteria.creationDate = {
         $gte : new Date(req.query.start),
         $lte : new Date(req.query.end)
       }
     }
     if(req.query.start){
-       criteria.creation_date = {
+       criteria.creationDate = {
         $gte : new Date(req.query.start)
       }
     }
 
     if(req.query.end){
-       criteria.creation_date = {
+       criteria.creationDate = {
         $lte : new Date(req.query.end)
       }
     }
@@ -244,7 +241,7 @@ router.get('/', function(req,res,next){
         .skip(offset)
         .limit(limit)
         .populate("author", '-_id -__v -password')
-        .populate("responsible_user", '-_id -__v -password')
+        .populate("responsibleUser", '-_id -__v -password')
         .exec(function(err, issues) {
           if (err) {
             res.status(500).send(err);
@@ -282,7 +279,7 @@ router.get('/', function(req,res,next){
     "type": "Incendie",
     "description": "Graffiti spotted at the train station",
     "status": "created",
-    "responsible_user": {
+    "responsibleUser": {
       "firstname": "Simon",
       "lastname": "Carlier",
       "email": "admin@simka.ch",
@@ -290,14 +287,11 @@ router.get('/', function(req,res,next){
         "staff"
       ]
     },
-    "creation_date": "2016-02-23T00:00:00.000Z",
+    "creationDate": "2016-02-23T00:00:00.000Z",
     "__v": 0,
     "actions": [],
-    "geometry": {
-      "coordinates": [
-        46.2,
-        7.34
-      ],
+    "location": {
+      "coordinates":[7.34,46.2],
       "type": "point"
     },
     "tags": [
@@ -314,7 +308,7 @@ router.get('/:id', function(req,res,next){
 
   Issue.find(criteria)
     .populate("author", '-_id -__v -password')
-    .populate("responsible_user", '-_id -__v -password')
+    .populate("responsibleUser", '-_id -__v -password')
     .exec(function(err, issues) {
       if (err) {
         res.status(500).send(err);
@@ -508,22 +502,22 @@ function findIssue(req, res, next){
  * @apiParam {Id} author author's id
  * @apiParam {String} description description of the issue
  * @apiParam {String[]} tags an array of tags
- * @apiParam {Number[]} geometry.coordinates the coordinates of the issue (lat,long)
+ * @apiParam {Number[]} location.coordinates the coordinates of the issue (lat,long)
  * @apiParam {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} status status of the issue
- * @apiParam {Id} responsible_user responsible user's id
+ * @apiParam {Id} responsibleUser responsible user's id
  * @apiParam {Action[]} actions the actions of the issue
- * @apiParam {Date} creation_date date of creation
+ * @apiParam {Date} creationDate date of creation
  *
  * @apiSuccess {Id} _id id of the issue
  * @apiSuccess {String} name name of the issue
  * @apiSuccess {Id} author author's id
  * @apiSuccess {String} description description of the issue
  * @apiSuccess {String[]} tags an array of tags
- * @apiSuccess {Number[]} geometry.coordinates the coordinates of the issue (lat,long)
+ * @apiSuccess {Number[]} location.coordinates the coordinates of the issue (lat,long)
  * @apiSuccess {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} status status of the issue
- * @apiSuccess {Id} responsible_user responsible user's id
+ * @apiSuccess {Id} responsibleUser responsible user's id
  * @apiSuccess {Action[]} actions the actions of the issue
- * @apiSuccess{Date} creation_date date of creation
+ * @apiSuccess{Date} creationDate date of creation
  *
  * @apiParamExample {json} Request-Example:
  *  {
@@ -532,13 +526,13 @@ function findIssue(req, res, next){
     *"type": "Incendie",
     *"tags":["ny","yverdon","oups"],
     *"description":"Graffiti spotted at the train station",
-    *"geometry":{
-    *    "coordinates":[46.2,7.34]
+    *"location":{
+    *    "coordinates":[7.34,46.2],
     *  },
     *"status" : "created",
-    *"responsible_user" : "56cec2b5310859ee16a3ec59",
+    *"responsibleUser" : "56cec2b5310859ee16a3ec59",
     *"actions":[],
-    *"creation_date" :"2016-02-25"
+    *"creationDate" :"2016-02-25"
     *}
  *
  *
