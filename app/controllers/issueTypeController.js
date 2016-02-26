@@ -96,3 +96,54 @@ router.get('/', function(req,res,next){
       })
 
 });
+
+// function to find an issue type with his id, given in the url
+function findIssueType(req, res, next) {
+  IssueType.findById(req.params.id, function(err, issueType) {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    } else if (!issueType) {
+      res.status(404).send('User not found');
+      return;
+    }
+
+    req.issueType = issueType;
+
+    next();
+  });
+}
+
+/**
+ * @api {get} /api/v1/issueTypes/:id Get an issue type
+ * @apiName Get an issue type
+ * @apiGroup issueTypes
+ *
+ * @apiParam {String}   _id ID of the issue type.
+ *
+ * @apiSuccess {String}   _id ID of the issue type.
+ * @apiSuccess {String}   name Name of the issue type.
+ * @apiSuccess {String}   author Id of the author of the new type.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *  {
+*     "_id": "56d013305456626274ea6071",
+*     "name": "Grafiti",
+*     "author": "56cc793a922ac0e6542d88df",
+*     "__v": 0
+ * }
+ *
+ * @apiError IssueType can't be found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "IssueTypeCantBeFound"
+ *     }
+ */
+router.get('/:id',findIssueType,function(req,res,next){
+
+  res.send(req.issueType);
+
+});
