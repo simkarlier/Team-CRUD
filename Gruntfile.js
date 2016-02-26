@@ -18,8 +18,9 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
     apidoc: {
         teamCrud: {
+	options: { debug: true },
         src: "app/",
-        dest: "documentation/"
+        dest: "public/doc/"
        }
     },    
     develop: {
