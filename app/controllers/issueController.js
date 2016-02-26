@@ -153,8 +153,31 @@ router.get('/', function(req,res,next){
   var offset = (page - 1) * pageSize,
       limit = pageSize;
 
-  var sort="creation_date";
+  var sort="-creation_date";
   
+
+  //GIS Implementation
+  var lat = req.query.lat,
+  lng = req.query.lng,
+  dist = req.query.dist;
+  
+  if (lat && lng && dist) {
+    criteria.location = {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates: [
+            parseFloat(lng),
+            parseFloat(lat)
+          ]
+        },
+        $maxDistance: parseInt(dist, 10)
+      }
+    };
+  }
+
+  console.log(criteria.geometry);
+
   if(req.query.type){
     criteria.type = req.query.type;
   }

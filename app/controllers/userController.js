@@ -136,7 +136,6 @@ function findUser(req, res, next) {
       return;
     }
 
-    // Store the book in the request.
     req.user = user;
 
     next();
