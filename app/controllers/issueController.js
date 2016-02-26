@@ -153,7 +153,7 @@ router.get('/', function(req,res,next){
   var offset = (page - 1) * pageSize,
       limit = pageSize;
 
-<<<<<<< HEAD
+
   var sort="-creation_date";
   
 
@@ -177,10 +177,9 @@ router.get('/', function(req,res,next){
     };
   }
 
-  console.log(criteria.geometry);
-=======
+
   var sort="creation_date";
->>>>>>> 62e11fc46c5485872ea7c36d5bebd01d4e90a6b6
+
 
   if(req.query.type){
     criteria.type = req.query.type;
