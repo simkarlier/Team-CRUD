@@ -1,11 +1,10 @@
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema
-
+    Schema = mongoose.Schema;
 
 var IssueSchema = new Schema({
 	  name:{type:String,required:true},
       author:{type:Schema.Types.ObjectId,ref:'User',required:true},
-      type:{type:String,required:true}, //validate:[valType,"Undefined type"]
+      type:{type:String,required:true},//, validate:[valType,"Undefined type"]},
       tags:{type:[String],required:true},
       description:{type:String,required:true},
       location:{
@@ -26,17 +25,15 @@ function valArray(array){
 	return array.length == 2;
 }
 
-/*
-function valType(type){
-	Type.find(function(err, types){
-    if(err){
-      res.status(500).send(err);
-      return;
-    }
-  	
-  })
-}
-
-*/ 
+// Asynchronous validator pour checking if the issue type is valid (in issueType)
+IssueSchema.path('type').validate(function (value, respond) {
+    mongoose.model('IssueType').find({name:value},function(err,result){
+      if(result.length == 0){
+          respond(false, 'There\'s no issue type like this');
+      }else{
+          respond(true,'Ok the type is known')
+      }
+    });
+}, 'this message does not matter');
 
 mongoose.model('Issue', IssueSchema);

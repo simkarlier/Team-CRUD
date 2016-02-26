@@ -155,13 +155,13 @@ router.get('/', function(req,res,next){
 
 
   var sort="-creation_date";
-  
+
 
   //GIS Implementation
   var lat = req.query.lat,
   lng = req.query.lng,
   dist = req.query.dist;
-  
+
   if (lat && lng && dist) {
     criteria.location = {
       $near: {
@@ -478,3 +478,84 @@ router.get('/:id/actions', function(req,res,next){
   });
 
 })
+
+
+function findIssue(req, res, next){
+
+  Publisher.findById(req.params.id, function(err, issue) {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    } else if (!issue) {
+      // Return an error if the publisher doesn't exist.
+      res.status(400).send('No publisher with ID ' + req.body.publisherId);
+      return;
+    }
+
+    req.issue = issue;
+
+    next();
+  });
+}
+
+
+/**
+ * @api {put} /api/v1/issues/:id Update an issue
+ * @apiName Update an issue
+ * @apiGroup Issues
+ *
+ * @apiParam {String} name name of the issue
+ * @apiParam {Id} author author's id
+ * @apiParam {String} description description of the issue
+ * @apiParam {String[]} tags an array of tags
+ * @apiParam {Number[]} geometry.coordinates the coordinates of the issue (lat,long)
+ * @apiParam {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} status status of the issue
+ * @apiParam {Id} responsible_user responsible user's id
+ * @apiParam {Action[]} actions the actions of the issue
+ * @apiParam {Date} creation_date date of creation
+ *
+ * @apiSuccess {Id} _id id of the issue
+ * @apiSuccess {String} name name of the issue
+ * @apiSuccess {Id} author author's id
+ * @apiSuccess {String} description description of the issue
+ * @apiSuccess {String[]} tags an array of tags
+ * @apiSuccess {Number[]} geometry.coordinates the coordinates of the issue (lat,long)
+ * @apiSuccess {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} status status of the issue
+ * @apiSuccess {Id} responsible_user responsible user's id
+ * @apiSuccess {Action[]} actions the actions of the issue
+ * @apiSuccess{Date} creation_date date of creation
+ *
+ * @apiParamExample {json} Request-Example:
+ *  {
+  *  "name":"Incendie",
+   * "author": "56cec2b5310859ee16a3ec59",
+    *"type": "Incendie",
+    *"tags":["ny","yverdon","oups"],
+    *"description":"Graffiti spotted at the train station",
+    *"geometry":{
+    *    "coordinates":[46.2,7.34]
+    *  },
+    *"status" : "created",
+    *"responsible_user" : "56cec2b5310859ee16a3ec59",
+    *"actions":[],
+    *"creation_date" :"2016-02-25"
+    *}
+ *
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500
+ */
+router.put('/:id',findIssue,function(req,res,next){
+
+  req.issue = req.body;
+
+  req.issue.save(function(err, updatedIssue) {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+
+    res.send(updatedIssue);
+  });
+
+});
