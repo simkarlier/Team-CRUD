@@ -12,8 +12,8 @@ module.exports = function (app) {
 
 
 /**
- * @api {post} /api/v1/users Create User
- * @apiName Create User
+ * @api {post} /api/v1/users Create a user
+ * @apiName Create a user
  * @apiGroup Users
  *
  * @apiParam {String}   firstname user firstname.
@@ -49,7 +49,7 @@ module.exports = function (app) {
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 404 Not Found
  *     {
- *       "error": "UserNotFound"
+ *       "error": "UserCantBeCreated"
  *     }
  */
 router.post('/', function (req, res, next) {
@@ -71,8 +71,8 @@ router.post('/', function (req, res, next) {
 
 
 /**
- * @api {get} /api/v1/users Get Users
- * @apiName Gets Users
+ * @api {get} /api/v1/users Get users
+ * @apiName Get users
  * @apiGroup Users
  *
  * @apiParam {String}   _id ID of the user.
@@ -104,12 +104,12 @@ router.post('/', function (req, res, next) {
   *     ]
   *   }
  *
- * @apiError There no user.
+ * @apiError There's no user.
  *
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 404 Not Found
  *     {
- *       "error": "UserNotFound"
+ *       "error": "UsersNotFound"
  *     }
  */
 router.get('/', function(req,res,next){
@@ -149,16 +149,9 @@ function findUser(req, res, next) {
 
 
 /**
- * @api {get} /api/v1/users/:id Get a User by Id
- * @apiName Get User
+ * @api {get} /api/v1/users/:id Get a user by Id
+ * @apiName Get a user
  * @apiGroup Users
- *
- * @apiParam {String}   _id ID of the user.
- * @apiParam {String}   firstname user firstname.
- * @apiParam {String}   lastname user lastname.
- * @apiParam {[String]} role user role(s).
- * @apiParam {String}   password user password.
- * @apiParam {String}   email user email.
  *
  *
  * @apiSuccess {String}   _id ID of the user.
@@ -214,20 +207,15 @@ function findAction(req, res, next) {
 
 
 /**
- * @api {get} /api/v1/users/:id/actions Get a User actions
- * @apiName Get User actions
+ * @api {get} /api/v1/users/:id/actions Get user action(s)
+ * @apiName Get user actions
  * @apiGroup Users
  *
- * @apiParam {String}   _id ID of the action.
- * @apiParam {String}   type Type of the action (comment or statusChange).
- * @apiParam {Date}     date Date of the action.
- * @apiParam {String}   newStatus The new status of the action (for type statusChange only).
- * @apiParam {String}   comment Comment of the action (for type comment only).
- * @apiParam {String}   authorId Author ID of the action.
+ * @apiParam {String}   _id ID of the user.
  *
  *
- * @apiSuccess {String}   _id ID of the action.
- * @apiSuccess   {String}   type Type of the action (comment or statusChange).
+ * @apiSuccess   {String}   _id ID of the action.
+ * @apiSuccess   {String="comment","statusChange"}   actionType  Type of action(s)
  * @apiSuccess   {Date}     date Date of the action.
  * @apiSuccess   {String}   newStatus The new status of the action (for type statusChange only).
  * @apiSuccess   {String}   comment Comment of the action (for type comment only).
@@ -250,16 +238,16 @@ function findAction(req, res, next) {
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 404 Not Found
  *     {
- *       "error": "UserNotFound"
+ *       "error": "ActionNotFound"
  *     }
  */
 router.get('/:id/actions', findUser, findAction, function(req,res,next){
   res.send(req.actions);
 });
 
+// function to find user action(s) by type
 function findActionByType(req, res, next) {
   Action.find({type: req.params.actionType})
-    // Do not forget to sort, as pagination makes more sense with sorting.
     .sort('date')
     .exec(function(err, actionsByType) {
       if (err) {
@@ -272,6 +260,42 @@ function findActionByType(req, res, next) {
     });
 }
 
+/**
+ * @api {get} /api/v1/users/:id/actions/:actionType Get user action(s) by type
+ * @apiName Get user actions by type
+ * @apiGroup Users
+ *
+ * @apiParam {String}   _id ID of the user.
+ * @apiParam {String="comment","statusChange"}   actionType  Type of action(s)
+ *
+ *
+ * @apiSuccess   {String}   _id ID of the action.
+ * @apiSuccess   {String}   type Type of the action (comment or statusChange).
+ * @apiSuccess   {Date}     date Date of the action.
+ * @apiSuccess   {String}   newStatus The new status of the action (for type statusChange only).
+ * @apiSuccess   {String}   comment Comment of the action (for type comment only).
+ * @apiSuccess   {String}   authorId Author ID of the action.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *  {
+ *    _id: "56ceccd871335d2d621e5cfc",
+ *    type: "comment",
+ *    date: "2015-06-21T00:00:00.000Z",
+ *    newStatus: "solved",
+ *    comment: "Salut c est un beau grafiti",
+ *    authorId: "56cc6d3562872f3250733a05",
+ *    __v: 0
+ *  }
+ *
+ * @apiError No action for this type for this user.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "ActionByTypeNotFound"
+ *     }
+ */
 router.get('/:id/actions/:actionType', findUser, findActionByType, function(req,res,next){
   res.send(req.actionsByType);
 });
