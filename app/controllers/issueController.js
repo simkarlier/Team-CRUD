@@ -3,7 +3,7 @@ router = express.Router(),
 mongoose = require('mongoose'),
 Action = mongoose.model('Action'),
 Issue = mongoose.model('Issue');
- 
+
 
 module.exports = function (app) {
   app.use('/api/v1/issues', router);
@@ -19,7 +19,7 @@ module.exports = function (app) {
  * @apiParam {Id} author author's id
  * @apiParam {String} description description of the issue
  * @apiParam {String[]} tags an array of tags
- * @apiParam {Number[]} geometry.coordinates the coordinates of the issue (lat,long) 
+ * @apiParam {Number[]} geometry.coordinates the coordinates of the issue (lat,long)
  * @apiParam {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} status status of the issue
  * @apiParam {Id} responsible_user responsible user's id
  * @apiParam {Action[]} actions the actions of the issue
@@ -30,7 +30,7 @@ module.exports = function (app) {
  * @apiSuccess {Id} author author's id
  * @apiSuccess {String} description description of the issue
  * @apiSuccess {String[]} tags an array of tags
- * @apiSuccess {Number[]} geometry.coordinates the coordinates of the issue (lat,long) 
+ * @apiSuccess {Number[]} geometry.coordinates the coordinates of the issue (lat,long)
  * @apiSuccess {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} status status of the issue
  * @apiSuccess {Id} responsible_user responsible user's id
  * @apiSuccess {Action[]} actions the actions of the issue
@@ -51,10 +51,10 @@ module.exports = function (app) {
     *"actions":[],
     *"creation_date" :"2016-02-25"
     *}
- * 
+ *
  *
  * @apiErrorExample Error-Response:
- *     HTTP/1.1 500 
+ *     HTTP/1.1 500
  */
 router.post('/', function (req, res, next) {
 
@@ -79,11 +79,11 @@ router.post('/', function (req, res, next) {
  * @apiName List the issues
  * @apiGroup Issues
  *
- * @apiParam {String} status 
+ * @apiParam {String} status
  * @apiParam {String[]} tags
  * @apiParam {Date} start the start date
- * @apiParam {Date} end the end date  
- * @apiParam {String} sort=creation_date the sort field 
+ * @apiParam {Date} end the end date
+ * @apiParam {String} sort=creation_date the sort field
  * @apiParam {Number} page page number
  * @apiParam {Number} pageSize page size
  *
@@ -149,10 +149,11 @@ router.get('/', function(req,res,next){
 
   var page = req.query.page ? parseInt(req.query.page, 10) : 1,
       pageSize = req.query.pageSize ? parseInt(req.query.pageSize, 10) : 30;
-  
+
   var offset = (page - 1) * pageSize,
       limit = pageSize;
 
+<<<<<<< HEAD
   var sort="-creation_date";
   
 
@@ -177,6 +178,9 @@ router.get('/', function(req,res,next){
   }
 
   console.log(criteria.geometry);
+=======
+  var sort="creation_date";
+>>>>>>> 62e11fc46c5485872ea7c36d5bebd01d4e90a6b6
 
   if(req.query.type){
     criteria.type = req.query.type;
@@ -193,14 +197,14 @@ router.get('/', function(req,res,next){
   } else if (req.query.tags) {
     criteria.tags = req.query.tags;
   }
-  
+
    // Filter by status, multi-status possible
   if (typeof(req.query.status) == "object" && req.query.status.length) {
     criteria.status = { $in: req.query.status };
   } else if (req.query.status) {
     criteria.status = req.query.status;
   }
-  if(req.query.start || req.query.end){ 
+  if(req.query.start || req.query.end){
 
     if(req.query.start && req.query.end){
        criteria.creation_date = {
@@ -219,7 +223,7 @@ router.get('/', function(req,res,next){
         $lte : new Date(req.query.end)
       }
     }
-     
+
   }
 
   Issue.count(function(err, totalCount) {
@@ -264,7 +268,7 @@ router.get('/', function(req,res,next){
  *
  * @apiParam {:id} id of the issue
  * @apiParam {String} lastname user lastname.
- 
+
  *
  * @apiSuccessExample Success-Response:
   [
@@ -334,11 +338,11 @@ router.get('/:id', function(req,res,next){
  * @apiParam {Date} date date
  @apiParam {Id} authorId the id of the author
  @apiParam {String} comment the text of the comment if stated
- @apiParam {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} newStatus the new status to change  
+ @apiParam {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} newStatus the new status to change
 
  *
  * @apiSuccessExample Success-Response:
-  
+
 {
     "type":"comment",
     "date":"2016-02-25",
@@ -376,7 +380,7 @@ router.post('/:id/actions', function(req,res,next){
             res.status(500).send(err);
             return;
           }
-          
+
           //add the last action to the client
           if(foundIssue.actions.length > 0){
             foundIssue.actions.push(createdAction._id);
@@ -395,7 +399,7 @@ router.post('/:id/actions', function(req,res,next){
             }
             res.send(createdAction);
           });
-      
+
         });
     }
   });
@@ -408,7 +412,7 @@ router.get('/:id/actions', function(req,res,next){
 
   var page = req.query.page ? parseInt(req.query.page, 10) : 1,
       pageSize = req.query.pageSize ? parseInt(req.query.pageSize, 10) : 30;
-  
+
   var offset = (page - 1) * pageSize,
       limit = pageSize;
 
@@ -423,7 +427,7 @@ router.get('/:id/actions', function(req,res,next){
     criteria.type = req.query.type;
   }
 
-  if(req.query.start || req.query.end){ 
+  if(req.query.start || req.query.end){
 
     if(req.query.start && req.query.end){
       criteria.date = {
@@ -441,7 +445,7 @@ router.get('/:id/actions', function(req,res,next){
       criteria.date = {
       $lte : new Date(req.query.end)
       }
-    }   
+    }
   }
 
 
@@ -476,9 +480,5 @@ router.get('/:id/actions', function(req,res,next){
         })
     })
   });
-  
+
 })
-
-
-
-
