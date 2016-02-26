@@ -93,7 +93,7 @@ router.get('/:id', findAction, function(req,res,next){
 function findActionByType(req, res, next) {
   Action.find({type: req.params.actionType})
     // Do not forget to sort, as pagination makes more sense with sorting.
-    .sort('date')
+    .sort('-date')
     .exec(function(err, actionsByType) {
       if (err) {
         console.log('fd')
