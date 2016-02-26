@@ -178,9 +178,6 @@ router.get('/', function(req,res,next){
   }
 
 
-  var sort="creation_date";
-
-
   if(req.query.type){
     criteria.type = req.query.type;
   }
