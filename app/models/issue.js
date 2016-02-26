@@ -8,8 +8,8 @@ var IssueSchema = new Schema({
       type:{type:String,required:true}, //validate:[valType,"Undefined type"]
       tags:{type:[String],required:true},
       description:{type:String,required:true},
-      geometry:{
-      	type : {type: String, enum: ['point'] , default: "point"},
+      location:{
+      	type: { type: String,default: "Point" },
       	coordinates :{type:[Number],required:true,validate:[valArray,"Incorrect number of coordinates"]}
       },
       status: {type: String, enum: ['created', 'acknowledged', 'assigned', 'in_progress', 'solved', 'rejected'] },
@@ -19,7 +19,7 @@ var IssueSchema = new Schema({
 });
 
 IssueSchema.index({
-	geometry: '2dsphere'
+	location: '2dsphere'
 });
 
 function valArray(array){
