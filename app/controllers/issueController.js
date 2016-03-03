@@ -60,16 +60,45 @@ router.post('/', function (req, res, next) {
 
   var issue = new Issue(req.body);
 
-  issue.save(function(err, createdIssue){
+  //changes the status and put a "creation" action
+  issue.status ="created"
+
+  //creates the new action
+  /*
+  "type":"statusChange",
+    "date":"2016-02-25",
+    "newStatus":"solved",
+    "authorId":"56ced76c0137995a1d0e8993"
+  */
+  var creationAction = new Action();
+  creationAction.type ="statusChange";
+  creationAction.date = req.body.creationDate;
+  creationAction.newStatus = "created";
+  creationAction.authorId = req.body.responsibleUser;
+
+  creationAction.save(function(err, createdAction){
 
     if(err){
       res.status(500).send(err);
       return;
     }
 
-    res.send(createdIssue);
+  
+    //changes the issue to take the created action
+    issue.actions = [createdAction._id];
 
+    issue.save(function(err, createdIssue){
+
+      if(err){
+        res.status(500).send(err);
+        return;
+      }
+      res.send(createdIssue);
+
+    });
   });
+
+
 });
 
 
@@ -83,7 +112,10 @@ router.post('/', function (req, res, next) {
  * @apiParam {String[]} tags
  * @apiParam {Date} start the start date
  * @apiParam {Date} end the end date
- * @apiParam {String} sort=creationDate the sort field
+ * @apiParam {String} sort=-creationDate the sort field
+ @apiParam {Number} lat the latitude of a point
+ @apiParam {Number} lng the longitude of a point
+ @apiParam {Number} dist the distance within the given point (params : lng, lat) 
  * @apiParam {Number} page page number
  * @apiParam {Number} pageSize page size
  *
@@ -144,6 +176,7 @@ router.post('/', function (req, res, next) {
 router.get('/', function(req,res,next){
   var criteria={};
 
+  //pagination
   var page = req.query.page ? parseInt(req.query.page, 10) : 1,
       pageSize = req.query.pageSize ? parseInt(req.query.pageSize, 10) : 30;
 
@@ -151,6 +184,7 @@ router.get('/', function(req,res,next){
       limit = pageSize;
 
 
+  //default sort
   var sort="-creationDate";
 
 
@@ -174,7 +208,7 @@ router.get('/', function(req,res,next){
     };
   }
 
-
+  //query using the type (view IssueType)
   if(req.query.type){
     criteria.type = req.query.type;
   }
@@ -191,12 +225,15 @@ router.get('/', function(req,res,next){
     criteria.tags = req.query.tags;
   }
 
-   // Filter by status, multi-status possible
+  // Filter by status, multi-status possible
   if (typeof(req.query.status) == "object" && req.query.status.length) {
     criteria.status = { $in: req.query.status };
   } else if (req.query.status) {
     criteria.status = req.query.status;
   }
+  
+
+  //Date management
   if(req.query.start || req.query.end){
 
     if(req.query.start && req.query.end){
@@ -219,6 +256,7 @@ router.get('/', function(req,res,next){
 
   }
 
+  //query the DB
   Issue.count(function(err, totalCount) {
     if (err) {
       res.status(500).send(err);
@@ -236,6 +274,7 @@ router.get('/', function(req,res,next){
       res.set('X-Pagination-Total', totalCount);
       res.set('X-Pagination-Filtered-Total', filteredCount);
 
+      //find the corresponding records, populate the users without showing the id nor the password
       Issue.find(criteria)
         .sort(sort)
         .skip(offset)
@@ -255,14 +294,14 @@ router.get('/', function(req,res,next){
 
 
 /**
- * @api {get} /api/v1/issues/:id
- * @apiName List one issue
- * @apiGroup Issues
- *
- * @apiParam {String} id  of the issue
-*
- *
- * @apiSuccessExample Success-Response:
+ @api {get} /api/v1/issues/:id
+ @apiName List one issue
+ @apiGroup Issues
+ 
+ @apiParam {String} id  of the issue
+
+ 
+ @apiSuccessExample Success-Response:
   [
   {
     "_id": "56ced76c0137995a1d0e8993",
@@ -300,7 +339,7 @@ router.get('/', function(req,res,next){
     ]
   }
 ]
-- */
+*/
 router.get('/:id', function(req,res,next){
   var criteria={};
   criteria._id = req.params.id;
@@ -319,18 +358,18 @@ router.get('/:id', function(req,res,next){
 
 
 /**
- * @api {post} /api/v1/issues/:id/actions Insert an action for an issue
- * @apiName Insert an action for an issue Insert an action for an issue
- * @apiGroup Issues
- *
- * @apiParam {String="comment","statusChange"} type type of action
- * @apiParam {Date} date date
+ @api {post} /api/v1/issues/:id/actions Insert an action for an issue
+ @apiName Insert an action for an issue
+ @apiGroup Issues
+ 
+ @apiParam {String="comment","statusChange"} type type of action
+ @apiParam {Date} date date
  @apiParam {Id} authorId the id of the author
  @apiParam {String} comment the text of the comment if stated
  @apiParam {String="created", "acknowledged", "assigned", "in_progress", "solved", "rejected"} newStatus the new status to change
 
- *
- * @apiSuccessExample Success-Response:
+ 
+ @apiSuccessExample Success-Response:
 
 {
     "type":"comment",
@@ -347,6 +386,9 @@ OR
     "newStatus":"solved",
     "authorId":"56ced76c0137995a1d0e8993"
 }
+
+@apiErrorExample Error-Response:
+    HTTP/1.1 500
 
 - */
 router.post('/:id/actions', function(req,res,next){
@@ -367,6 +409,11 @@ router.post('/:id/actions', function(req,res,next){
         Issue.findOne(criteria,function(err, foundIssue) {
           if (err) {
             res.status(500).send(err);
+            return;
+          }
+
+          if (foundIssue.creationDate>createdAction.date) {
+            res.status(500).send("Date of the action smaller than the date of the issue");
             return;
           }
 
@@ -395,7 +442,38 @@ router.post('/:id/actions', function(req,res,next){
 });
 
 
-
+/**
+ * @api {get} /api/v1/actions Get all actions related to an issue
+ * @apiName Get all actions related to an issue
+ * @apiGroup Issues
+ *
+ *
+ * @apiSuccess   {String} _id Id of the action
+ * @apiSuccess   {String="comment","statusChange"}   actionType  Type of action(s)
+ * @apiSuccess   {Date}     date Date of the action.
+ * @apiSuccess   {String}   newStatus The new status of the action (for type statusChange only).
+ * @apiSuccess   {String}   comment Comment of the action (for type comment only).
+ * @apiSuccess   {String}   authorId Author ID of the action.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+  *   {
+  *     _id: "56ceccd871335d2d621e5cfc",
+  *     type: "comment",
+  *     date: "2015-06-21T00:00:00.000Z",
+  *     newStatus: "solved",
+  *     comment: "Salut c est un beau grafiti",
+  *     authorId: "56cc6d3562872f3250733a05"
+  *   }
+ *
+ * @apiError ActionsNotFound There's no action.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "ActionsNotFound"
+ *     }
+ */
 router.get('/:id/actions', function(req,res,next){
   var criteria={};
 
@@ -585,10 +663,9 @@ router.put('/:id',findIssue,function(req,res,next){
     *"actions":[],
     *"creation_date" :"2016-02-25"
     *}
- *
- *
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 500
+ 
+ @apiErrorExample Error-Response:
+    HTTP/1.1 500
  */
 router.delete('/:id',findIssue,function(req,res,next){
   req.issue.remove(function(err) {

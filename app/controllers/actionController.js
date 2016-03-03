@@ -10,58 +10,6 @@ module.exports = function (app) {
 };
 
 
-/**
- * @api {post} /api/v1/actions Create an action
- * @apiName Create an action
- * @apiGroup Actions
- *
- * @apiParam   {String="comment","statusChange"}   actionType  Type of action(s)
- * @apiParam   {Date}     date Date of the action.
- * @apiParam   {String}   newStatus The new status of the action (for type statusChange only).
- * @apiParam   {String}   comment Comment of the action (for type comment only).
- * @apiParam   {String}   authorId Author ID of the action.
- *
- * @apiSuccess   {String} _id Id of the action created
- * @apiSuccess   {String="comment","statusChange"}   actionType  Type of action(s)
- * @apiSuccess   {Date}     date Date of the action.
- * @apiSuccess   {String}   newStatus The new status of the action (for type statusChange only).
- * @apiSuccess   {String}   comment Comment of the action (for type comment only).
- * @apiSuccess   {String}   authorId Author ID of the action.
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
-  *   {
-  *     _id: "56ceccd871335d2d621e5cfc",
-  *     type: "comment",
-  *     date: "2015-06-21T00:00:00.000Z",
-  *     newStatus: "solved",
-  *     comment: "Salut c est un beau grafiti",
-  *     authorId: "56cc6d3562872f3250733a05"
-  *   }
- *
- * @apiError CantCreateAction The action can't be created.
- *
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 404 Not Found
- *     {
- *       "error": "ActionCantBeCreated"
- *     }
- */
-router.post('/', function (req, res, next) {
-
-  var action = new Action(req.body);
-
-  action.save(function(err, createdAction){
-
-    if(err){
-      res.status(500).send(err);
-      return;
-    }
-
-    res.send(createdAction);
-
-  });
-});
 
 /**
  * @api {get} /api/v1/actions Get all actions
@@ -70,7 +18,7 @@ router.post('/', function (req, res, next) {
  *
  *
  * @apiSuccess   {String} _id Id of the action
- * @apiSuccess   {String="comment","statusChange"}   actionType  Type of action(s)
+ * @apiSuccess   {String="comment","statusChange"}   type  Type of action(s)
  * @apiSuccess   {Date}     date Date of the action.
  * @apiSuccess   {String}   newStatus The new status of the action (for type statusChange only).
  * @apiSuccess   {String}   comment Comment of the action (for type comment only).
@@ -134,7 +82,7 @@ function findAction(req, res, next) {
  *
  *
  * @apiSuccess   {String} _id Id of the action
- * @apiSuccess   {String="comment","statusChange"}   actionType  Type of action(s)
+ * @apiSuccess   {String="comment","statusChange"}   type  Type of action(s)
  * @apiSuccess   {Date}     date Date of the action.
  * @apiSuccess   {String}   newStatus The new status of the action (for type statusChange only).
  * @apiSuccess   {String}   comment Comment of the action (for type comment only).
@@ -167,12 +115,11 @@ router.get('/:id', findAction, function(req,res,next){
 
 // function to find actions by type
 function findActionByType(req, res, next) {
-  Action.find({type: req.params.actionType})
+  Action.find({type: req.params.type})
     // Do not forget to sort, as pagination makes more sense with sorting.
     .sort('-date')
     .exec(function(err, actionsByType) {
       if (err) {
-        console.log('fd')
         res.status(500).send(err);
         return;
       }
@@ -183,13 +130,13 @@ function findActionByType(req, res, next) {
 }
 
 /**
- * @api {get} /api/v1/actions/type/:actionType  Get all actions by type
+ * @api {get} /api/v1/actions/type/:type  Get all actions by type
  * @apiName Get all actions by type
  * @apiGroup Actions
  *
  *
  * @apiSuccess   {String} _id Id of the action
- * @apiSuccess   {String="comment","statusChange"}   actionType  Type of action(s)
+ * @apiSuccess   {String="comment","statusChange"}   type  Type of action(s)
  * @apiSuccess   {Date}     date Date of the action.
  * @apiSuccess   {String}   newStatus The new status of the action (for type statusChange only).
  * @apiSuccess   {String}   comment Comment of the action (for type comment only).
@@ -214,7 +161,7 @@ function findActionByType(req, res, next) {
  *       "error": "ActionsNotFound"
  *     }
  */
-router.get('/type/:actionType', findActionByType, function(req,res,next){
+router.get('/type/:type', findActionByType, function(req,res,next){
 
     res.send(req.actionsByType);
 

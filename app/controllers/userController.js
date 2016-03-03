@@ -75,15 +75,8 @@ router.post('/', function (req, res, next) {
  * @api {get} /api/v1/users Get users
  * @apiName Get users
  * @apiGroup Users
- *
- * @apiParam {String}   _id ID of the user.
- * @apiParam {String}   firstname user firstname.
- * @apiParam {String}   lastname user lastname.
- * @apiParam {[String]} role user role(s).
- * @apiParam {String}   password user password.
- * @apiParam {String}   email user email.
- *
- *
+ 
+ @apiParam {String="numberOfCreatedIssues","numberOfSolvedIssues","numberOfUnsolvedOrRejectedIssues"} embed special stats
  * @apiSuccess {String}   _id ID of the user.
  * @apiSuccess {String}   firstname user firstname.
  * @apiSuccess {String}   lastname user lastname.
@@ -116,7 +109,6 @@ router.post('/', function (req, res, next) {
 router.get('/', function(req,res,next){
 
     
-    
     //if the user specifies special stats
     if(req.query.embed){
       
@@ -135,7 +127,7 @@ router.get('/', function(req,res,next){
           res.send(numberOfIssues);
         });
         //return the .get function
-      return;
+        return;
       }
       else if(req.query.embed == "numberOfSolvedIssues"){
         var criteria ={};
@@ -153,7 +145,7 @@ router.get('/', function(req,res,next){
           res.send(numberOfIssues);
         });
         //return the .get function
-      return;
+        return;
       }
       else if(req.query.embed == "numberOfUnsolvedOrRejectedIssues"){
         var criteria ={};
@@ -171,12 +163,11 @@ router.get('/', function(req,res,next){
           res.send(numberOfIssues);
         });
         //return the .get function
-      return;
+        return;
       }
     }
     
-
-  
+  //if nothing is specified
   User.find()
       .sort('lastname')
       .exec(function(err, users) {
